@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "143142801251",
+    "firebase_url": "https://fl-mane.firebaseio.com",
+    "project_id": "fl-mane",
+    "storage_bucket": "fl-mane.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:143142801251:android:14e0de5c56541e37",
+        "android_client_info": {
+          "package_name": "com.firebaseapp.sowbreira_26fe1.fl_mane"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "143142801251-teu9m2sn8qu8nffl2b0erqqandaefuph.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.firebaseapp.sowbreira_26fe1.fl_mane",
+            "certificate_hash": "44229405a0efc810864d25e6cf53cbbed465f53e"
+          }
+        },
+        {
+          "client_id": "143142801251-9rdskmc88u8pshai13frg4talk4uiie5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDN6hXbosam5-JpUcTY3sNTZM1JzhMsoTw"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "143142801251-9rdskmc88u8pshai13frg4talk4uiie5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Fl-Mane</string>
+    <string name="server_on_maintenance_come_back_later">Server is unstable or on maintenance. Please try again later.</string>
+    <string name="logando">Loading</string>
+    <string name="log_out">LOG OUT</string>
+    <string name="app_subTitle">Formula league-Manager &amp; Engineer</string>
+    <string name="app_Mane">Manager &amp; Engineer</string>
+    <string name="close_app">EXIT</string>
+    <string name="changeName">Change Name</string>
+    <string name="retry">Retry</string>
+</resources>
