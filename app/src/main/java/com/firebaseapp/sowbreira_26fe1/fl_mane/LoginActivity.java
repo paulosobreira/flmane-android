@@ -35,6 +35,17 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.ArrayList;
+
 import cz.msebera.android.httpclient.Header;
 import cz.msebera.android.httpclient.message.BasicHeader;
 import jp.wasabeef.picasso.transformations.CropCircleTransformation;
@@ -54,11 +65,18 @@ public class LoginActivity extends AppCompatActivity {
     private FirebaseUser user;
     private String nome;
     private int contTentaEntrar = 0;
+    private String host;
+    //final String host = "http://192.168.15.17:8080";
+    //final String host = "http://j82-sobreira-app.7e14.starter-us-west-2.openshiftapps.com/";
+    //String host = "http://f1mane-sobreira.193b.starter-ca-central-1.openshiftapps.com/";
+    //final String host = "http://35.198.38.242:80";
+    //final String host = "http://192.168.99.100:8080";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         progressDialog = new ProgressDialog(this);
+        carregaHost();
         setContentView(R.layout.activity_login);
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
@@ -136,30 +154,50 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+    private void carregaHost() {
+        new Thread(new Runnable() {
+
+            public void run() {
+                URLConnection feedUrl = null;
+                try {
+                    feedUrl = new URL("https://sowbreira-26fe1.firebaseapp.com/f1mane/host").openConnection();
+
+                    InputStream is = feedUrl.getInputStream();
+
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+                    String line = null;
+
+                    while ((line = reader.readLine()) != null) // read line by line
+                    {
+                        host = line; // add line to list
+                    }
+                    is.close(); // close input stream
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
     private void tentaEntrar() {
         contTentaEntrar++;
-        //final String host = "http://192.168.15.17:8080";
-        //final String host = "http://j82-sobreira-app.7e14.starter-us-west-2.openshiftapps.com/";
-        //String host = "http://f1mane-sobreira.193b.starter-ca-central-1.openshiftapps.com/";
-        //final String host = "http://35.198.38.242:80";
-        final String host = "http://192.168.99.100:8080";
         if (user != null) {
-            entrarAutenticado(host);
+            entrarAutenticado();
         } else {
-            entrarAnonimo(host);
+            entrarAnonimo();
         }
     }
 
-    private void entrarAnonimo(final String host) {
+    private void entrarAnonimo() {
         final SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-        String token = settings.getString("token",null);
+        String token = settings.getString("token", null);
         progressDialog.setMessage(this.getString(R.string.logando));
         progressDialog.setCancelable(false);
         progressDialog.show();
         AsyncHttpClient client = new AsyncHttpClient();
         String criar = "/f1mane/rest/letsRace/criarSessaoVisitante";
-        String renovar = "/f1mane/rest/letsRace/renovarSessaoVisitante/"+token;
-        String urlTest = host+(token==null?criar:renovar);
+        String renovar = "/f1mane/rest/letsRace/renovarSessaoVisitante/" + token;
+        String urlTest = host + (token == null ? criar : renovar);
         client.get(urlTest, new RequestParams(), new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -179,6 +217,7 @@ public class LoginActivity extends AppCompatActivity {
                 }
 
             }
+
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 falhou();
@@ -258,12 +297,39 @@ public class LoginActivity extends AppCompatActivity {
             nome = user.getDisplayName();
         }
         nomeUsuario.setText(nome);
-        ImageView fotoUsuario = (ImageView) findViewById(R.id.fotoUsuario);
-        String foto = user.getPhotoUrl().toString();
-        Picasso.with(this).load(foto)
-                .transform(new CropCircleTransformation())
-                .placeholder(R.drawable.ic_user_place_holder)
-                .into(fotoUsuario);
+        final ImageView fotoUsuario = (ImageView) findViewById(R.id.fotoUsuario);
+        final String foto = user.getPhotoUrl().toString();
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.get(foto, new AsyncHttpResponseHandler() {
+
+            @Override
+            public void onStart() {
+                // called before request is started
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] response) {
+                Picasso.with(LoginActivity.this).load(foto)
+                        .transform(new CropCircleTransformation())
+                        .placeholder(R.drawable.ic_user_place_holder)
+                        .into(fotoUsuario);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
+                Picasso.with(LoginActivity.this).load("https://sowbreira-26fe1.firebaseapp.com/f1mane/headset.png")
+                        .transform(new CropCircleTransformation())
+                        .placeholder(R.drawable.ic_user_place_holder)
+                        .into(fotoUsuario);
+            }
+
+            @Override
+            public void onRetry(int retryNo) {
+                // called when request is retried
+            }
+        });
+
     }
 
     private void signIn() {
@@ -322,7 +388,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     @NonNull
-    private FirebaseUser entrarAutenticado(final String host) {
+    private FirebaseUser entrarAutenticado() {
         progressDialog.setMessage(this.getString(R.string.logando));
         progressDialog.setCancelable(false);
         progressDialog.show();
