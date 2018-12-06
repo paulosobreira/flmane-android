@@ -121,6 +121,12 @@ public class LoginActivity extends AppCompatActivity {
             signInButton.setVisibility(View.VISIBLE);
         }
 
+        findViewById(R.id.fotoUsuarioMore).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mudarFoto();
+            }
+        });
 
         findViewById(R.id.srv1).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -176,13 +182,14 @@ public class LoginActivity extends AppCompatActivity {
         }).start();
     }
 
-    private void tentaEntrar() {
+    private void mudarFoto() {
         Intent intent = new Intent(LoginActivity.this, GridActivity.class);
         startActivity(intent);
         finish();
+    }
 
-        /*
-        if(host==null){
+    private void tentaEntrar() {
+        if (host == null) {
             carregaHost();
         }
         contTentaEntrar++;
@@ -191,7 +198,6 @@ public class LoginActivity extends AppCompatActivity {
         } else {
             entrarAnonimo();
         }
-        */
     }
 
     private void entrarAnonimo() {

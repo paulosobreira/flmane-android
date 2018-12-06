@@ -49,23 +49,45 @@
         android:id="@+id/botoes_login"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"
+        android:layout_marginBottom="0dp"
         android:clickable="true"
         android:focusable="true"
         android:gravity="bottom"
         android:orientation="vertical"
         app:layout_constraintTop_toTopOf="parent">
 
-        <ImageView
-            android:id="@+id/fotoUsuario"
-            android:layout_width="wrap_content"
-            android:layout_height="100dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginVertical="5dp"
-            android:adjustViewBounds="true"
-            android:cropToPadding="true"
-            app:srcCompat="@drawable/ic_user_place_holder"
-            tools:ignore="VectorDrawableCompat" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/fotoUsuarioMore"
+                android:layout_width="60dp"
+                android:layout_height="100dp"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginVertical="5dp"
+                android:layout_marginRight="49dp"
+                android:cropToPadding="true"
+                app:srcCompat="@drawable/ic_more"
+                tools:ignore="VectorDrawableCompat" />
+
+            <ImageView
+                android:id="@+id/fotoUsuario"
+                android:layout_width="match_parent"
+                android:layout_height="115dp"
+                android:layout_alignEnd="@+id/fotoUsuarioMore"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginVertical="5dp"
+                android:layout_marginEnd="-50dp"
+                android:adjustViewBounds="true"
+                app:srcCompat="@drawable/ic_user_place_holder"
+                tools:ignore="VectorDrawableCompat" />
+
+
+        </RelativeLayout>
 
         <TextView
             android:id="@+id/nomeUsuario"
@@ -78,9 +100,11 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             android:textSize="15dp"
             android:textStyle="bold" />
+
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
+
             <com.google.android.gms.common.SignInButton
                 android:id="@+id/button_google"
                 android:layout_width="match_parent"
@@ -90,6 +114,7 @@
                 android:layout_marginVertical="5dp"
                 android:background="#40ffffff"
                 android:visibility="visible" />
+
             <Button
                 android:id="@+id/sing_out"
                 android:layout_width="match_parent"
@@ -101,8 +126,6 @@
                 android:text="@string/log_out"
                 android:visibility="invisible" />
         </RelativeLayout>
-
-
 
 
         <Button
@@ -144,8 +167,8 @@
         android:id="@+id/exit"
         android:layout_width="71dp"
         android:layout_height="63dp"
-        android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
         android:background="#00ffffff"
         app:srcCompat="@mipmap/ic_exit_foreground" />
 </RelativeLayout>
