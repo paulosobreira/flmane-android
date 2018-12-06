@@ -39,12 +39,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
 
 import cz.msebera.android.httpclient.Header;
 import cz.msebera.android.httpclient.message.BasicHeader;
@@ -65,6 +61,7 @@ public class LoginActivity extends AppCompatActivity {
     private FirebaseUser user;
     private String nome;
     private int contTentaEntrar = 0;
+    private String foto;
     private String host;
     //final String host = "http://192.168.15.17:8080";
     //final String host = "http://j82-sobreira-app.7e14.starter-us-west-2.openshiftapps.com/";
@@ -102,7 +99,7 @@ public class LoginActivity extends AppCompatActivity {
         changeNameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                changeName();
+                mudarName();
             }
         });
         mAuth = FirebaseAuth.getInstance();
@@ -173,19 +170,28 @@ public class LoginActivity extends AppCompatActivity {
                     }
                     is.close(); // close input stream
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    Log.e(TAG, "carregaHost: ", e);
                 }
             }
         }).start();
     }
 
     private void tentaEntrar() {
+        Intent intent = new Intent(LoginActivity.this, GridActivity.class);
+        startActivity(intent);
+        finish();
+
+        /*
+        if(host==null){
+            carregaHost();
+        }
         contTentaEntrar++;
         if (user != null) {
             entrarAutenticado();
         } else {
             entrarAnonimo();
         }
+        */
     }
 
     private void entrarAnonimo() {
@@ -211,7 +217,7 @@ public class LoginActivity extends AppCompatActivity {
                     SharedPreferences.Editor editor = settings.edit();
                     editor.putString("token", token);
                     editor.commit();
-                    irParaMain(host, token);
+                    irParaMain(token);
                 } catch (JSONException e) {
                     Log.e(TAG, "onSuccess: ", e);
                 }
@@ -238,7 +244,7 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    private void changeName() {
+    private void mudarName() {
         Intent intent = new Intent(LoginActivity.this, NomeActivity.class);
         String nomeExtra = null;
         if (user != null) {
@@ -256,7 +262,7 @@ public class LoginActivity extends AppCompatActivity {
         finish();
     }
 
-    private void irParaMain(String host, String token) {
+    private void irParaMain(String token) {
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
         Bundle extras = new Bundle();
         extras.putString("token", token);
@@ -291,17 +297,15 @@ public class LoginActivity extends AppCompatActivity {
         fotoUsuario.setImageResource(R.drawable.ic_user_place_holder);
     }
 
-    private void preencheFotoNomeUsuario(FirebaseUser user) {
+    private void preencheFotoNomeUsuario(final FirebaseUser user) {
         TextView nomeUsuario = (TextView) findViewById(R.id.nomeUsuario);
         if (nome == null || "".equals(nome)) {
             nome = user.getDisplayName();
         }
         nomeUsuario.setText(nome);
-        final ImageView fotoUsuario = (ImageView) findViewById(R.id.fotoUsuario);
-        final String foto = user.getPhotoUrl().toString();
 
         AsyncHttpClient client = new AsyncHttpClient();
-        client.get(foto, new AsyncHttpResponseHandler() {
+        client.get(user.getPhotoUrl().toString(), new AsyncHttpResponseHandler() {
 
             @Override
             public void onStart() {
@@ -310,18 +314,14 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] response) {
-                Picasso.with(LoginActivity.this).load(foto)
-                        .transform(new CropCircleTransformation())
-                        .placeholder(R.drawable.ic_user_place_holder)
-                        .into(fotoUsuario);
+                foto = user.getPhotoUrl().toString();
+                preenchePortrait();
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
-                Picasso.with(LoginActivity.this).load("https://sowbreira-26fe1.firebaseapp.com/f1mane/headset.png")
-                        .transform(new CropCircleTransformation())
-                        .placeholder(R.drawable.ic_user_place_holder)
-                        .into(fotoUsuario);
+                foto = "https://sowbreira-26fe1.firebaseapp.com/f1mane/headset.png";
+                preenchePortrait();
             }
 
             @Override
@@ -330,6 +330,14 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void preenchePortrait() {
+        final ImageView fotoUsuario = (ImageView) findViewById(R.id.fotoUsuario);
+        Picasso.with(LoginActivity.this).load(foto)
+                .transform(new CropCircleTransformation())
+                .placeholder(R.drawable.ic_user_place_holder)
+                .into(fotoUsuario);
     }
 
     private void signIn() {
@@ -396,10 +404,6 @@ public class LoginActivity extends AppCompatActivity {
         AsyncHttpClient client = new AsyncHttpClient();
         String url = host + "/f1mane/rest/letsRace/criarSessaoGoogle";
 
-        String urlFoto = "";
-        if (user.getPhotoUrl() != null) {
-            urlFoto = user.getPhotoUrl().toString();
-        }
 
         if ((nome == null || "".equals(nome)) && user.getDisplayName() != null) {
             nome = user.getDisplayName();
@@ -412,7 +416,7 @@ public class LoginActivity extends AppCompatActivity {
         BasicHeader[] headers = new BasicHeader[]{new BasicHeader("idGoogle", user.getUid()),
                 new BasicHeader("nome", nome),
                 new BasicHeader("email", email),
-                new BasicHeader("urlFoto", urlFoto)};
+                new BasicHeader("urlFoto", foto)};
         client.get(getBaseContext(), url, headers, new RequestParams(), new JsonHttpResponseHandler() {
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 Log.d("TAG", "signInWithCredential:success");
@@ -422,7 +426,7 @@ public class LoginActivity extends AppCompatActivity {
                 try {
                     JSONObject sessaoCliente = (JSONObject) response.get("sessaoCliente");
                     String token = sessaoCliente.getString("token");
-                    irParaMain(host, token);
+                    irParaMain(token);
                 } catch (JSONException e) {
                     Log.e(TAG, "onSuccess: ", e);
                 }

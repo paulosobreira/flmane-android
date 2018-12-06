@@ -8,4 +8,5 @@
     <string name="close_app">EXIT</string>
     <string name="changeName">Change Name</string>
     <string name="retry">Retry</string>
+    <string name="title_activity_grid">GridActivity</string>
 </resources>

@@ -23,7 +23,11 @@
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation|screenSize" />
-        <activity android:name=".NomeActivity"></activity>
+        <activity android:name=".NomeActivity" />
+        <activity
+            android:name=".GridActivity"
+            android:label="@string/title_activity_grid"
+            android:theme="@style/AppTheme"></activity>
     </application>
 
 </manifest>
