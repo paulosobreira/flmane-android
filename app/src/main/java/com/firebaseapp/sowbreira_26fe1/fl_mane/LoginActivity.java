@@ -326,7 +326,7 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
-                foto = "https://sowbreira-26fe1.firebaseapp.com/f1mane/headset.png";
+                foto = "https://sowbreira-26fe1.firebaseapp.com/f1mane/profile/profile-0.png";
                 preenchePortrait();
             }
 

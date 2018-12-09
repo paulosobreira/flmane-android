@@ -18,7 +18,7 @@ public class ImageAdapter extends BaseAdapter {
     }
 
     public int getCount() {
-        return 40;
+        return 12;
     }
 
     public Object getItem(int position) {
@@ -42,7 +42,8 @@ public class ImageAdapter extends BaseAdapter {
             imageView = (ImageView) convertView;
         }
 
-        Picasso.with(mContext).load("https://celebritynetworthnow.com/wp-content/uploads/2018/08/alain-prost_77906.jpeg")
+        String path = "https://sowbreira-26fe1.firebaseapp.com/f1mane/profile/profile-"+position+".png";
+        Picasso.with(mContext).load(path)
                 .transform(new CropCircleTransformation())
                 .placeholder(R.drawable.ic_user_place_holder)
                 .into(imageView);
