@@ -24,6 +24,7 @@
         android:horizontalSpacing="10dp"
         android:numColumns="auto_fit"
         android:stretchMode="spacingWidthUniform"
+        android:listSelector="@drawable/selector"
         android:verticalSpacing="10dp" />
 
     <ImageButton
