@@ -9,7 +9,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -54,14 +53,16 @@ public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "TAG";
     private GoogleSignInClient mGoogleSignInClient;
     private FirebaseAuth mAuth;
+    private FirebaseUser user;
     private ProgressDialog progressDialog;
     private View signInButton;
-    private View signOutButton;
-    private View changeNameButton;
-    private FirebaseUser user;
+
+
     private String nome;
-    private int contTentaEntrar = 0;
     private String foto;
+
+    private int contTentaEntrar = 0;
+
     private String host;
     //final String host = "http://192.168.15.17:8080";
     //final String host = "http://j82-sobreira-app.7e14.starter-us-west-2.openshiftapps.com/";
@@ -80,13 +81,7 @@ public class LoginActivity extends AppCompatActivity {
                 .requestEmail()
                 .build();
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-        signOutButton = findViewById(R.id.sing_out);
-        signOutButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                signOut();
-            }
-        });
+
         signInButton = findViewById(R.id.button_google);
         signInButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -95,17 +90,9 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        changeNameButton = findViewById(R.id.change_name);
-        changeNameButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mudarName();
-            }
-        });
         mAuth = FirebaseAuth.getInstance();
 
         user = mAuth.getCurrentUser();
-
 
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
         String def = "";
@@ -116,7 +103,7 @@ public class LoginActivity extends AppCompatActivity {
 
         if (user != null) {
             preencheFotoNomeUsuario(user);
-            criaBotaoLogout();
+            signInButton.setVisibility(View.INVISIBLE);
         } else {
             signInButton.setVisibility(View.VISIBLE);
         }
@@ -124,7 +111,9 @@ public class LoginActivity extends AppCompatActivity {
         findViewById(R.id.fotoUsuarioMore).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mudarFoto();
+                Intent intent = new Intent(LoginActivity.this, PerfilActivity.class);
+                startActivity(intent);
+                finish();
             }
         });
 
@@ -156,6 +145,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
     }
+
 
     private void carregaHost() {
         new Thread(new Runnable() {
@@ -250,24 +240,6 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    private void mudarName() {
-        Intent intent = new Intent(LoginActivity.this, NomeActivity.class);
-        String nomeExtra = null;
-        if (user != null) {
-            nomeExtra = user.getDisplayName();
-        }
-        if (nome != null && !"".equals(nome)) {
-            nomeExtra = nome;
-        }
-        if (nomeExtra != null) {
-            Bundle extras = new Bundle();
-            extras.putString("nome", nomeExtra);
-            intent.putExtras(extras); //Put your id to your next Intent
-        }
-        startActivity(intent);
-        finish();
-    }
-
     private void irParaMain(String token) {
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
         Bundle extras = new Bundle();
@@ -278,30 +250,6 @@ public class LoginActivity extends AppCompatActivity {
         finish();
     }
 
-    private void criaBotaoLogout() {
-        signOutButton.setVisibility(View.VISIBLE);
-        changeNameButton.setVisibility(View.VISIBLE);
-        signInButton.setVisibility(View.INVISIBLE);
-    }
-
-    private void signOut() {
-        mAuth.signOut();
-        mGoogleSignInClient.signOut();
-        user = null;
-        LinearLayout linear = findViewById(R.id.botoes_login);
-        linear.removeView(findViewById(new Integer(99)));
-        signOutButton.setVisibility(View.INVISIBLE);
-        changeNameButton.setVisibility(View.INVISIBLE);
-        signInButton.setVisibility(View.VISIBLE);
-        removeFotoNomeUsuario();
-    }
-
-    private void removeFotoNomeUsuario() {
-        TextView nomeUsuario = (TextView) findViewById(R.id.nomeUsuario);
-        nomeUsuario.setText(R.string.app_Mane);
-        ImageView fotoUsuario = (ImageView) findViewById(R.id.fotoUsuario);
-        fotoUsuario.setImageResource(R.drawable.ic_user_place_holder);
-    }
 
     private void preencheFotoNomeUsuario(final FirebaseUser user) {
         TextView nomeUsuario = (TextView) findViewById(R.id.nomeUsuario);
@@ -387,7 +335,6 @@ public class LoginActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             user = mAuth.getCurrentUser();
                             preencheFotoNomeUsuario(user);
-                            criaBotaoLogout();
                         } else {
                             // If sign in fails, display a message to the user.
                             Toast.makeText(LoginActivity.this, task.getException().getLocalizedMessage(),

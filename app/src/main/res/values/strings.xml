@@ -9,4 +9,5 @@
     <string name="changeName">Change Name</string>
     <string name="retry">Retry</string>
     <string name="title_activity_grid">GridActivity</string>
+    <string name="changePicture">CHANGE PICTURE</string>
 </resources>
