@@ -40,21 +40,21 @@ public class GridActivity extends AppCompatActivity {
 //                            Toast.LENGTH_LONG).show();
 //                }
                 editor.commit();
-                voltaLogin();
+                voltaPerfil();
             }
         });
         findViewById(R.id.cancel_foto).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 GridActivity.this.finish();
-                voltaLogin();
+                voltaPerfil();
             }
         });
 
     }
 
-    private void voltaLogin() {
-        Intent intent = new Intent(GridActivity.this, LoginActivity.class);
+    private void voltaPerfil() {
+        Intent intent = new Intent(GridActivity.this, PerfilActivity.class);
         startActivity(intent);
         finish();
     }

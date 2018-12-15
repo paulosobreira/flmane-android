@@ -32,20 +32,20 @@ public class NomeActivity extends AppCompatActivity {
                             Toast.LENGTH_LONG).show();
                 }
                 editor.commit();
-                voltaLogin();
+                voltaPerfil();
             }
         });
         findViewById(R.id.cancel_nome).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 NomeActivity.this.finish();
-                voltaLogin();
+                voltaPerfil();
             }
         });
     }
 
-    private void voltaLogin() {
-        Intent intent = new Intent(NomeActivity.this, LoginActivity.class);
+    private void voltaPerfil() {
+        Intent intent = new Intent(NomeActivity.this, PerfilActivity.class);
         startActivity(intent);
         finish();
     }

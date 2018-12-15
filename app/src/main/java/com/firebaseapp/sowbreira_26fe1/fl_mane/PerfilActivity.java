@@ -1,6 +1,7 @@
 package com.firebaseapp.sowbreira_26fe1.fl_mane;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -13,15 +14,13 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.squareup.picasso.Picasso;
 
-import cz.msebera.android.httpclient.Header;
 import jp.wasabeef.picasso.transformations.CropCircleTransformation;
 
 public class PerfilActivity extends AppCompatActivity {
     private View changeNameButton;
+    private View changePictureButton;
     private View signOutButton;
     private View backButton;
     private FirebaseAuth mAuth;
@@ -29,13 +28,14 @@ public class PerfilActivity extends AppCompatActivity {
     private GoogleSignInClient mGoogleSignInClient;
     private String nome;
     private String foto;
+    private SharedPreferences settings;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_perfil);
-
+        settings = getSharedPreferences(LoginActivity.PREFS_NAME, 0);
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
@@ -49,7 +49,19 @@ public class PerfilActivity extends AppCompatActivity {
         changeNameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mudarName();
+                Intent intent = new Intent(PerfilActivity.this, NomeActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+
+        changePictureButton = findViewById(R.id.change_picture);
+        changePictureButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(PerfilActivity.this, GridActivity.class);
+                startActivity(intent);
+                finish();
             }
         });
 
@@ -81,24 +93,6 @@ public class PerfilActivity extends AppCompatActivity {
         finish();
     }
 
-    private void mudarName() {
-        Intent intent = new Intent(PerfilActivity.this, NomeActivity.class);
-        String nomeExtra = null;
-//        if (user != null) {
-//            nomeExtra = user.getDisplayName();
-//        }
-//        if (nome != null && !"".equals(nome)) {
-//            nomeExtra = nome;
-//        }
-        if (nomeExtra != null) {
-            Bundle extras = new Bundle();
-            extras.putString("nome", nomeExtra);
-            intent.putExtras(extras); //Put your id to your next Intent
-        }
-        startActivity(intent);
-        finish();
-    }
-
 
     private void signOut() {
         mAuth.signOut();
@@ -106,59 +100,21 @@ public class PerfilActivity extends AppCompatActivity {
         user = null;
         LinearLayout linear = findViewById(R.id.botoes_login);
         linear.removeView(findViewById(new Integer(99)));
-        //signOutButton.setVisibility(View.INVISIBLE);
-        changeNameButton.setVisibility(View.INVISIBLE);
-        removeFotoNomeUsuario();
+        settings.edit().clear();
     }
 
-    private void removeFotoNomeUsuario() {
-        TextView nomeUsuario = (TextView) findViewById(R.id.nomeUsuario);
-        nomeUsuario.setText(R.string.app_Mane);
-        ImageView fotoUsuario = (ImageView) findViewById(R.id.fotoUsuario);
-        fotoUsuario.setImageResource(R.drawable.ic_user_place_holder);
-    }
 
     private void preencheFotoNomeUsuario(final FirebaseUser user) {
         TextView nomeUsuario = (TextView) findViewById(R.id.nomeUsuario);
-        if (nome == null || "".equals(nome)) {
-            nome = user.getDisplayName();
-        }
+        String nome = settings.getString("nome", null);
         nomeUsuario.setText(nome);
-
-        AsyncHttpClient client = new AsyncHttpClient();
-        client.get(user.getPhotoUrl().toString(), new AsyncHttpResponseHandler() {
-
-            @Override
-            public void onStart() {
-                // called before request is started
-            }
-
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, byte[] response) {
-                foto = user.getPhotoUrl().toString();
-                preenchePortrait();
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
-                foto = "https://sowbreira-26fe1.firebaseapp.com/f1mane/profile/profile-0.png";
-                preenchePortrait();
-            }
-
-            @Override
-            public void onRetry(int retryNo) {
-                // called when request is retried
-            }
-        });
-
-    }
-
-    private void preenchePortrait() {
-        final ImageView fotoUsuario = (ImageView) findViewById(R.id.fotoUsuario);
+        String foto = settings.getString("foto", null);
+        ImageView fotoUsuario = (ImageView) findViewById(R.id.fotoUsuario);
         Picasso.with(PerfilActivity.this).load(foto)
                 .transform(new CropCircleTransformation())
                 .placeholder(R.drawable.ic_user_place_holder)
                 .into(fotoUsuario);
+
     }
 
 }

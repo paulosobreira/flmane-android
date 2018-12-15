@@ -40,6 +40,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Date;
 
 import cz.msebera.android.httpclient.Header;
 import cz.msebera.android.httpclient.message.BasicHeader;
@@ -56,10 +57,7 @@ public class LoginActivity extends AppCompatActivity {
     private FirebaseUser user;
     private ProgressDialog progressDialog;
     private View signInButton;
-
-
-    private String nome;
-    private String foto;
+    private SharedPreferences settings;
 
     private int contTentaEntrar = 0;
 
@@ -73,6 +71,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        settings = getSharedPreferences(LoginActivity.PREFS_NAME, 0);
         progressDialog = new ProgressDialog(this);
         carregaHost();
         setContentView(R.layout.activity_login);
@@ -93,13 +92,6 @@ public class LoginActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
 
         user = mAuth.getCurrentUser();
-
-        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-        String def = "";
-        if (user != null) {
-            def = user.getDisplayName();
-        }
-        nome = settings.getString("nome", def);
 
         if (user != null) {
             preencheFotoNomeUsuario(user);
@@ -124,20 +116,6 @@ public class LoginActivity extends AppCompatActivity {
                 tentaEntrar();
             }
         });
-        /*
-        findViewById(R.id.srv2).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //String host = "http://172.17.9.169:80";
-                String host = "http://f1mane-sobreira.193b.starter-ca-central-1.openshiftapps.com//";
-                if (user != null) {
-                    entrarAutenticado(host);
-                } else {
-                    irParaMain(host, null);
-                }
-            }
-        });
-        */
         findViewById(R.id.exit).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -153,7 +131,7 @@ public class LoginActivity extends AppCompatActivity {
             public void run() {
                 URLConnection feedUrl = null;
                 try {
-                    feedUrl = new URL("https://sowbreira-26fe1.firebaseapp.com/f1mane/host").openConnection();
+                    feedUrl = new URL("https://sowbreira-26fe1.firebaseapp.com/f1mane/host?ver="+new Date().getTime()).openConnection();
 
                     InputStream is = feedUrl.getInputStream();
 
@@ -191,7 +169,6 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void entrarAnonimo() {
-        final SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
         String token = settings.getString("token", null);
         progressDialog.setMessage(this.getString(R.string.logando));
         progressDialog.setCancelable(false);
@@ -252,42 +229,61 @@ public class LoginActivity extends AppCompatActivity {
 
 
     private void preencheFotoNomeUsuario(final FirebaseUser user) {
-        TextView nomeUsuario = (TextView) findViewById(R.id.nomeUsuario);
-        if (nome == null || "".equals(nome)) {
+        String nome = settings.getString("nome", null);
+        if(nome == null){
             nome = user.getDisplayName();
+            if(nome == null || "".equals(nome)){
+                nome = "Lastname";
+            }
+            SharedPreferences.Editor editor = settings.edit();
+            editor.putString("nome", nome);
+            editor.commit();
         }
+
+        TextView nomeUsuario = (TextView) findViewById(R.id.nomeUsuario);
+
         nomeUsuario.setText(nome);
 
-        AsyncHttpClient client = new AsyncHttpClient();
-        client.get(user.getPhotoUrl().toString(), new AsyncHttpResponseHandler() {
+        String foto = settings.getString("foto",null);
+        if(foto!=null){
+            preenchePortrait(foto);
+        }else{
+            AsyncHttpClient client = new AsyncHttpClient();
+            client.get(user.getPhotoUrl().toString(), new AsyncHttpResponseHandler() {
 
-            @Override
-            public void onStart() {
-                // called before request is started
-            }
+                @Override
+                public void onStart() {
+                    // called before request is started
+                }
 
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, byte[] response) {
-                foto = user.getPhotoUrl().toString();
-                preenchePortrait();
-            }
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, byte[] response) {
+                    String foto = user.getPhotoUrl().toString();
+                    preenchePortrait(foto);
+                }
 
-            @Override
-            public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
-                foto = "https://sowbreira-26fe1.firebaseapp.com/f1mane/profile/profile-0.png";
-                preenchePortrait();
-            }
+                @Override
+                public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
+                    String foto = "https://sowbreira-26fe1.firebaseapp.com/f1mane/profile/profile-0.png";
+                    preenchePortrait(foto);
+                }
 
-            @Override
-            public void onRetry(int retryNo) {
-                // called when request is retried
-            }
-        });
+                @Override
+                public void onRetry(int retryNo) {
+                    // called when request is retried
+                }
+            });
+        }
+
+
 
     }
 
-    private void preenchePortrait() {
-        final ImageView fotoUsuario = (ImageView) findViewById(R.id.fotoUsuario);
+    private void preenchePortrait(String foto) {
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString("foto", foto);
+        editor.commit();
+        ImageView fotoUsuario = (ImageView) findViewById(R.id.fotoUsuario);
         Picasso.with(LoginActivity.this).load(foto)
                 .transform(new CropCircleTransformation())
                 .placeholder(R.drawable.ic_user_place_holder)
@@ -335,6 +331,7 @@ public class LoginActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             user = mAuth.getCurrentUser();
                             preencheFotoNomeUsuario(user);
+                            signInButton.setVisibility(View.INVISIBLE);
                         } else {
                             // If sign in fails, display a message to the user.
                             Toast.makeText(LoginActivity.this, task.getException().getLocalizedMessage(),
@@ -357,10 +354,10 @@ public class LoginActivity extends AppCompatActivity {
         AsyncHttpClient client = new AsyncHttpClient();
         String url = host + "/f1mane/rest/letsRace/criarSessaoGoogle";
 
+        String nome = settings.getString("nome","Lastname");
 
-        if ((nome == null || "".equals(nome)) && user.getDisplayName() != null) {
-            nome = user.getDisplayName();
-        }
+        String foto = settings.getString("foto","https://sowbreira-26fe1.firebaseapp.com/f1mane/profile/profile-0.png");
+
         String email = "";
         if (user.getEmail() != null) {
             email = user.getEmail();
