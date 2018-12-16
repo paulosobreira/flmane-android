@@ -7,9 +7,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.Toast;
 
 public class GridActivity extends AppCompatActivity {
+
+    private int itemPosition = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,23 +23,19 @@ public class GridActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
                 gridview.setItemChecked(position, true);
-                Toast.makeText(GridActivity.this, "" + position,
-                        Toast.LENGTH_SHORT).show();
+                itemPosition = position;
             }
         });
 
         findViewById(R.id.ok_foto).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(itemPosition<0){
+                    return;
+                }
                 SharedPreferences settings = getSharedPreferences(LoginActivity.PREFS_NAME, 0);
                 SharedPreferences.Editor editor = settings.edit();
-//                String nome = editText.getText().toString();
-//                if (nome != null && !"".equals(nome)) {
-//                    editor.putString("nome", nome);
-//                } else {
-//                    Toast.makeText(NomeActivity.this, "Canceled",
-//                            Toast.LENGTH_LONG).show();
-//                }
+                editor.putString("foto", "https://sowbreira-26fe1.firebaseapp.com/f1mane/profile/profile-"+itemPosition+".png");
                 editor.commit();
                 voltaPerfil();
             }

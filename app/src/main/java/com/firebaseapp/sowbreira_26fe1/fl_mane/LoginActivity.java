@@ -57,16 +57,11 @@ public class LoginActivity extends AppCompatActivity {
     private FirebaseUser user;
     private ProgressDialog progressDialog;
     private View signInButton;
+    private View perfil;
     private SharedPreferences settings;
 
     private int contTentaEntrar = 0;
 
-    private String host;
-    //final String host = "http://192.168.15.17:8080";
-    //final String host = "http://j82-sobreira-app.7e14.starter-us-west-2.openshiftapps.com/";
-    //String host = "http://f1mane-sobreira.193b.starter-ca-central-1.openshiftapps.com/";
-    //final String host = "http://35.198.38.242:80";
-    //final String host = "http://192.168.99.100:8080";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,14 +88,17 @@ public class LoginActivity extends AppCompatActivity {
 
         user = mAuth.getCurrentUser();
 
+        perfil = findViewById(R.id.perfil);
+
         if (user != null) {
             preencheFotoNomeUsuario(user);
             signInButton.setVisibility(View.INVISIBLE);
         } else {
             signInButton.setVisibility(View.VISIBLE);
+            perfil.setVisibility(View.INVISIBLE);
         }
 
-        findViewById(R.id.fotoUsuarioMore).setOnClickListener(new View.OnClickListener() {
+        perfil.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(LoginActivity.this, PerfilActivity.class);
@@ -126,6 +124,12 @@ public class LoginActivity extends AppCompatActivity {
 
 
     private void carregaHost() {
+        if(true){
+            SharedPreferences.Editor editor = settings.edit();
+            editor.putString("host", "http://192.168.15.18:8080");
+            editor.commit();
+            return;
+        }
         new Thread(new Runnable() {
 
             public void run() {
@@ -137,12 +141,14 @@ public class LoginActivity extends AppCompatActivity {
 
                     BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
                     String line = null;
-
-                    while ((line = reader.readLine()) != null) // read line by line
-                    {
+                    String host = null;
+                    while ((line = reader.readLine()) != null)  {
                         host = line; // add line to list
                     }
                     is.close(); // close input stream
+                    SharedPreferences.Editor editor = settings.edit();
+                    editor.putString("host", host);
+                    editor.commit();
                 } catch (IOException e) {
                     Log.e(TAG, "carregaHost: ", e);
                 }
@@ -150,14 +156,8 @@ public class LoginActivity extends AppCompatActivity {
         }).start();
     }
 
-    private void mudarFoto() {
-        Intent intent = new Intent(LoginActivity.this, GridActivity.class);
-        startActivity(intent);
-        finish();
-    }
-
     private void tentaEntrar() {
-        if (host == null) {
+        if (getHost() == null) {
             carregaHost();
         }
         contTentaEntrar++;
@@ -176,7 +176,7 @@ public class LoginActivity extends AppCompatActivity {
         AsyncHttpClient client = new AsyncHttpClient();
         String criar = "/f1mane/rest/letsRace/criarSessaoVisitante";
         String renovar = "/f1mane/rest/letsRace/renovarSessaoVisitante/" + token;
-        String urlTest = host + (token == null ? criar : renovar);
+        String urlTest = getHost() + (token == null ? criar : renovar);
         client.get(urlTest, new RequestParams(), new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -217,11 +217,15 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+    private String getHost() {
+        return settings.getString("host", null);
+    }
+
     private void irParaMain(String token) {
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
         Bundle extras = new Bundle();
         extras.putString("token", token);
-        extras.putString("host", host);
+        extras.putString("host", getHost());
         intent.putExtras(extras); //Put your id to your next Intent
         startActivity(intent);
         finish();
@@ -274,9 +278,7 @@ public class LoginActivity extends AppCompatActivity {
                 }
             });
         }
-
-
-
+        perfil.setVisibility(View.VISIBLE);
     }
 
     private void preenchePortrait(String foto) {
@@ -352,7 +354,7 @@ public class LoginActivity extends AppCompatActivity {
         progressDialog.show();
 
         AsyncHttpClient client = new AsyncHttpClient();
-        String url = host + "/f1mane/rest/letsRace/criarSessaoGoogle";
+        String url = getHost() + "/f1mane/rest/letsRace/criarSessaoGoogle";
 
         String nome = settings.getString("nome","Lastname");
 

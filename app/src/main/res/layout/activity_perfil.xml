@@ -85,7 +85,6 @@
             android:layout_marginHorizontal="10dp"
             android:layout_marginVertical="5dp"
             android:background="#60ffffff"
-            android:visibility="invisible"
             android:text="@string/changeName"/>
         <Button
             android:id="@+id/sing_out"
@@ -95,7 +94,6 @@
             android:layout_marginHorizontal="10dp"
             android:layout_marginVertical="5dp"
             android:background="#60ffffff"
-            android:visibility="invisible"
             android:text="@string/log_out" />
     </LinearLayout>
 

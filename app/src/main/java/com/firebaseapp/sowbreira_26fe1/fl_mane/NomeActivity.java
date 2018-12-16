@@ -13,16 +13,13 @@ public class NomeActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        final SharedPreferences settings = getSharedPreferences(LoginActivity.PREFS_NAME, 0);
         setContentView(R.layout.activity_nome);
         final EditText editText = findViewById(R.id.txt_nome);
-        Bundle extras = getIntent().getExtras();
-        if (extras != null) {
-            editText.setText(extras.getString("nome"));
-        }
+        editText.setText(settings.getString("nome", "Lastname"));
         findViewById(R.id.ok_nome).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                SharedPreferences settings = getSharedPreferences(LoginActivity.PREFS_NAME, 0);
                 SharedPreferences.Editor editor = settings.edit();
                 String nome = editText.getText().toString();
                 if (nome != null && !"".equals(nome)) {

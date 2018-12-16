@@ -82,8 +82,6 @@ public class PerfilActivity extends AppCompatActivity {
         });
         if (user != null) {
             preencheFotoNomeUsuario(user);
-            signOutButton.setVisibility(View.VISIBLE);
-            changeNameButton.setVisibility(View.VISIBLE);
         }
     }
 
@@ -100,7 +98,7 @@ public class PerfilActivity extends AppCompatActivity {
         user = null;
         LinearLayout linear = findViewById(R.id.botoes_login);
         linear.removeView(findViewById(new Integer(99)));
-        settings.edit().clear();
+        settings.edit().clear().commit();
     }
 
 
@@ -109,11 +107,13 @@ public class PerfilActivity extends AppCompatActivity {
         String nome = settings.getString("nome", null);
         nomeUsuario.setText(nome);
         String foto = settings.getString("foto", null);
-        ImageView fotoUsuario = (ImageView) findViewById(R.id.fotoUsuario);
-        Picasso.with(PerfilActivity.this).load(foto)
-                .transform(new CropCircleTransformation())
-                .placeholder(R.drawable.ic_user_place_holder)
-                .into(fotoUsuario);
+        if(foto!=null){
+            ImageView fotoUsuario = (ImageView) findViewById(R.id.fotoUsuario);
+            Picasso.with(PerfilActivity.this).load(foto)
+                    .transform(new CropCircleTransformation())
+                    .placeholder(R.drawable.ic_user_place_holder)
+                    .into(fotoUsuario);
+        }
 
     }
 
