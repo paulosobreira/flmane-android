@@ -3,6 +3,8 @@ package com.firebaseapp.sowbreira_26fe1.fl_mane;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -61,6 +63,7 @@ public class LoginActivity extends AppCompatActivity {
     private SharedPreferences settings;
 
     private int contTentaEntrar = 0;
+    private boolean local = false;
 
 
     @Override
@@ -120,11 +123,19 @@ public class LoginActivity extends AppCompatActivity {
                 LoginActivity.this.finishAndRemoveTask();
             }
         });
+        TextView versao = findViewById(R.id.versao);
+        try {
+            PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            versao.setText(pInfo.versionName);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
     }
 
 
     private void carregaHost() {
-        if(true){
+        if(local){
             SharedPreferences.Editor editor = settings.edit();
             editor.putString("host", "http://192.168.15.18:8080");
             editor.commit();
