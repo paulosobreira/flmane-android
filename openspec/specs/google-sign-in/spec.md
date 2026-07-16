@@ -4,9 +4,7 @@
 
 Google account sign-in for Fl-Mane's Android app, using Android's Credential Manager API to
 authenticate the user with Firebase and mint a backend session token via `criarSessaoGoogle`.
-
 ## Requirements
-
 ### Requirement: Google sign-in is initiated via Credential Manager
 The system SHALL let a signed-out user authenticate with a Google account through Android's Credential Manager API ("Sign in with Google"), replacing the legacy `GoogleSignInClient` intent-based flow.
 
@@ -42,3 +40,4 @@ The system SHALL clear Credential Manager's cached credential state, in addition
 #### Scenario: User signs out from the profile screen
 - **WHEN** the user taps "Sair" (sign out) on the profile screen
 - **THEN** the system signs out of Firebase Auth, clears Credential Manager's credential state, and returns to the login screen with the sign-in button visible
+

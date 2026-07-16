@@ -5,9 +5,7 @@
 Backend host discovery for Fl-Mane's Android app, which fetches the active backend host URL
 from a remote endpoint on launch and caches it locally so sign-in can proceed reliably even
 when discovery is unavailable or returns bad data.
-
 ## Requirements
-
 ### Requirement: Malformed or empty discovery responses do not overwrite a known-good host
 The system SHALL validate the fetched host value before persisting it, and SHALL leave the previously cached host untouched if the discovery request fails or returns a value that is blank or not a well-formed HTTPS URL.
 
@@ -24,3 +22,4 @@ Note: host discovery already used HTTPS (`https://sowbreira-26fe1.firebaseapp.co
 #### Scenario: Discovery request fails
 - **WHEN** the discovery request fails due to a network error or non-success response
 - **THEN** the app leaves the previously cached host value untouched, allowing sign-in to proceed using the last known-good host
+

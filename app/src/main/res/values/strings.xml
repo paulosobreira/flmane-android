@@ -5,9 +5,10 @@
     <string name="log_out">LOG OUT</string>
     <string name="app_subTitle">Formula league-Manager &amp; Engineer</string>
     <string name="app_Mane">Manager &amp; Engineer</string>
-    <string name="close_app">EXIT</string>
     <string name="changeName">Change Name</string>
     <string name="retry">Retry</string>
+    <string name="sign_in_google">Sign in with Google</string>
+    <string name="sign_in_cancelled">Sign-in cancelled</string>
     <string name="title_activity_grid">GridActivity</string>
     <string name="changePicture">CHANGE PICTURE</string>
 </resources>

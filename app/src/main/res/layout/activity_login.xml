@@ -105,7 +105,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
 
-            <com.google.android.gms.common.SignInButton
+            <Button
                 android:id="@+id/button_google"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -113,6 +113,7 @@
                 android:layout_marginHorizontal="10dp"
                 android:layout_marginVertical="5dp"
                 android:background="#40ffffff"
+                android:text="@string/sign_in_google"
                 android:visibility="visible" />
 
 
