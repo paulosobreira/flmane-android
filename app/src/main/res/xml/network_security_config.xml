@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!--
+        Libera HTTP puro (cleartext) só para o servidor de desenvolvimento local — o Android
+        bloqueia cleartext por padrão a partir do targetSdk 28. Produção continua exigindo HTTPS
+        (config padrão abaixo, sem overrides). Se o IP da sua máquina de dev mudar, atualize aqui.
+    -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">192.168.1.116</domain>
+    </domain-config>
+</network-security-config>
